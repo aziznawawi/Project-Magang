@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 22 Jan 2024 pada 07.09
--- Versi server: 10.4.28-MariaDB
--- Versi PHP: 8.2.4
+-- Waktu pembuatan: 02 Okt 2025 pada 04.45
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,57 +18,509 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
+-- Database: `phpmyadmin`
+--
+CREATE DATABASE IF NOT EXISTS `phpmyadmin` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
+USE `phpmyadmin`;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__bookmark`
+--
+
+CREATE TABLE `pma__bookmark` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `dbase` varchar(255) NOT NULL DEFAULT '',
+  `user` varchar(255) NOT NULL DEFAULT '',
+  `label` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `query` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Bookmarks';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__central_columns`
+--
+
+CREATE TABLE `pma__central_columns` (
+  `db_name` varchar(64) NOT NULL,
+  `col_name` varchar(64) NOT NULL,
+  `col_type` varchar(64) NOT NULL,
+  `col_length` text DEFAULT NULL,
+  `col_collation` varchar(64) NOT NULL,
+  `col_isNull` tinyint(1) NOT NULL,
+  `col_extra` varchar(255) DEFAULT '',
+  `col_default` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Central list of columns';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__column_info`
+--
+
+CREATE TABLE `pma__column_info` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `column_name` varchar(64) NOT NULL DEFAULT '',
+  `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `mimetype` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `transformation` varchar(255) NOT NULL DEFAULT '',
+  `transformation_options` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation` varchar(255) NOT NULL DEFAULT '',
+  `input_transformation_options` varchar(255) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Column information for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__designer_settings`
+--
+
+CREATE TABLE `pma__designer_settings` (
+  `username` varchar(64) NOT NULL,
+  `settings_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Settings related to Designer';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__export_templates`
+--
+
+CREATE TABLE `pma__export_templates` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `export_type` varchar(10) NOT NULL,
+  `template_name` varchar(64) NOT NULL,
+  `template_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved export templates';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__favorite`
+--
+
+CREATE TABLE `pma__favorite` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Favorite tables';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__history`
+--
+
+CREATE TABLE `pma__history` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db` varchar(64) NOT NULL DEFAULT '',
+  `table` varchar(64) NOT NULL DEFAULT '',
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp(),
+  `sqlquery` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='SQL history for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__navigationhiding`
+--
+
+CREATE TABLE `pma__navigationhiding` (
+  `username` varchar(64) NOT NULL,
+  `item_name` varchar(64) NOT NULL,
+  `item_type` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Hidden items of navigation tree';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__pdf_pages`
+--
+
+CREATE TABLE `pma__pdf_pages` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `page_nr` int(10) UNSIGNED NOT NULL,
+  `page_descr` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='PDF relation pages for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__recent`
+--
+
+CREATE TABLE `pma__recent` (
+  `username` varchar(64) NOT NULL,
+  `tables` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Recently accessed tables';
+
+--
+-- Dumping data untuk tabel `pma__recent`
+--
+
+INSERT INTO `pma__recent` (`username`, `tables`) VALUES
+('root', '[{\"db\":\"stokbarang\",\"table\":\"pengguna\"},{\"db\":\"stokbarang\",\"table\":\"barang\"}]');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__relation`
+--
+
+CREATE TABLE `pma__relation` (
+  `master_db` varchar(64) NOT NULL DEFAULT '',
+  `master_table` varchar(64) NOT NULL DEFAULT '',
+  `master_field` varchar(64) NOT NULL DEFAULT '',
+  `foreign_db` varchar(64) NOT NULL DEFAULT '',
+  `foreign_table` varchar(64) NOT NULL DEFAULT '',
+  `foreign_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Relation table';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__savedsearches`
+--
+
+CREATE TABLE `pma__savedsearches` (
+  `id` int(5) UNSIGNED NOT NULL,
+  `username` varchar(64) NOT NULL DEFAULT '',
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `search_name` varchar(64) NOT NULL DEFAULT '',
+  `search_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Saved searches';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__table_coords`
+--
+
+CREATE TABLE `pma__table_coords` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `pdf_page_number` int(11) NOT NULL DEFAULT 0,
+  `x` float UNSIGNED NOT NULL DEFAULT 0,
+  `y` float UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table coordinates for phpMyAdmin PDF output';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__table_info`
+--
+
+CREATE TABLE `pma__table_info` (
+  `db_name` varchar(64) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `display_field` varchar(64) NOT NULL DEFAULT ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Table information for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__table_uiprefs`
+--
+
+CREATE TABLE `pma__table_uiprefs` (
+  `username` varchar(64) NOT NULL,
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `prefs` text NOT NULL,
+  `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Tables'' UI preferences';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__tracking`
+--
+
+CREATE TABLE `pma__tracking` (
+  `db_name` varchar(64) NOT NULL,
+  `table_name` varchar(64) NOT NULL,
+  `version` int(10) UNSIGNED NOT NULL,
+  `date_created` datetime NOT NULL,
+  `date_updated` datetime NOT NULL,
+  `schema_snapshot` text NOT NULL,
+  `schema_sql` text DEFAULT NULL,
+  `data_sql` longtext DEFAULT NULL,
+  `tracking` set('UPDATE','REPLACE','INSERT','DELETE','TRUNCATE','CREATE DATABASE','ALTER DATABASE','DROP DATABASE','CREATE TABLE','ALTER TABLE','RENAME TABLE','DROP TABLE','CREATE INDEX','DROP INDEX','CREATE VIEW','ALTER VIEW','DROP VIEW') DEFAULT NULL,
+  `tracking_active` int(1) UNSIGNED NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database changes tracking for phpMyAdmin';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__userconfig`
+--
+
+CREATE TABLE `pma__userconfig` (
+  `username` varchar(64) NOT NULL,
+  `timevalue` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `config_data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User preferences storage for phpMyAdmin';
+
+--
+-- Dumping data untuk tabel `pma__userconfig`
+--
+
+INSERT INTO `pma__userconfig` (`username`, `timevalue`, `config_data`) VALUES
+('root', '2025-10-02 02:44:20', '{\"Console\\/Mode\":\"collapse\",\"lang\":\"id\"}');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__usergroups`
+--
+
+CREATE TABLE `pma__usergroups` (
+  `usergroup` varchar(64) NOT NULL,
+  `tab` varchar(64) NOT NULL,
+  `allowed` enum('Y','N') NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='User groups with configured menu items';
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pma__users`
+--
+
+CREATE TABLE `pma__users` (
+  `username` varchar(64) NOT NULL,
+  `usergroup` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and their assignments to user groups';
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indeks untuk tabel `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `pma__central_columns`
+--
+ALTER TABLE `pma__central_columns`
+  ADD PRIMARY KEY (`db_name`,`col_name`);
+
+--
+-- Indeks untuk tabel `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `db_name` (`db_name`,`table_name`,`column_name`);
+
+--
+-- Indeks untuk tabel `pma__designer_settings`
+--
+ALTER TABLE `pma__designer_settings`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indeks untuk tabel `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_user_type_template` (`username`,`export_type`,`template_name`);
+
+--
+-- Indeks untuk tabel `pma__favorite`
+--
+ALTER TABLE `pma__favorite`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indeks untuk tabel `pma__history`
+--
+ALTER TABLE `pma__history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `username` (`username`,`db`,`table`,`timevalue`);
+
+--
+-- Indeks untuk tabel `pma__navigationhiding`
+--
+ALTER TABLE `pma__navigationhiding`
+  ADD PRIMARY KEY (`username`,`item_name`,`item_type`,`db_name`,`table_name`);
+
+--
+-- Indeks untuk tabel `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  ADD PRIMARY KEY (`page_nr`),
+  ADD KEY `db_name` (`db_name`);
+
+--
+-- Indeks untuk tabel `pma__recent`
+--
+ALTER TABLE `pma__recent`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indeks untuk tabel `pma__relation`
+--
+ALTER TABLE `pma__relation`
+  ADD PRIMARY KEY (`master_db`,`master_table`,`master_field`),
+  ADD KEY `foreign_field` (`foreign_db`,`foreign_table`);
+
+--
+-- Indeks untuk tabel `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `u_savedsearches_username_dbname` (`username`,`db_name`,`search_name`);
+
+--
+-- Indeks untuk tabel `pma__table_coords`
+--
+ALTER TABLE `pma__table_coords`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`pdf_page_number`);
+
+--
+-- Indeks untuk tabel `pma__table_info`
+--
+ALTER TABLE `pma__table_info`
+  ADD PRIMARY KEY (`db_name`,`table_name`);
+
+--
+-- Indeks untuk tabel `pma__table_uiprefs`
+--
+ALTER TABLE `pma__table_uiprefs`
+  ADD PRIMARY KEY (`username`,`db_name`,`table_name`);
+
+--
+-- Indeks untuk tabel `pma__tracking`
+--
+ALTER TABLE `pma__tracking`
+  ADD PRIMARY KEY (`db_name`,`table_name`,`version`);
+
+--
+-- Indeks untuk tabel `pma__userconfig`
+--
+ALTER TABLE `pma__userconfig`
+  ADD PRIMARY KEY (`username`);
+
+--
+-- Indeks untuk tabel `pma__usergroups`
+--
+ALTER TABLE `pma__usergroups`
+  ADD PRIMARY KEY (`usergroup`,`tab`,`allowed`);
+
+--
+-- Indeks untuk tabel `pma__users`
+--
+ALTER TABLE `pma__users`
+  ADD PRIMARY KEY (`username`,`usergroup`);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__bookmark`
+--
+ALTER TABLE `pma__bookmark`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__column_info`
+--
+ALTER TABLE `pma__column_info`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__export_templates`
+--
+ALTER TABLE `pma__export_templates`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__history`
+--
+ALTER TABLE `pma__history`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__pdf_pages`
+--
+ALTER TABLE `pma__pdf_pages`
+  MODIFY `page_nr` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `pma__savedsearches`
+--
+ALTER TABLE `pma__savedsearches`
+  MODIFY `id` int(5) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
 -- Database: `stokbarang`
 --
+CREATE DATABASE IF NOT EXISTS `stokbarang` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `stokbarang`;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `keluar`
+-- Struktur dari tabel `barang`
 --
 
-CREATE TABLE `keluar` (
-  `idkeluar` int(11) NOT NULL,
-  `idbarang` int(11) NOT NULL,
-  `namabarang` varchar(50) NOT NULL,
-  `tanggal` date NOT NULL,
-  `jmlkeluar` int(100) NOT NULL,
-  `penerima` varchar(50) NOT NULL
+CREATE TABLE `barang` (
+  `kd_barang` bigint(20) NOT NULL,
+  `nama_barang` varchar(100) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `satuan` varchar(50) DEFAULT NULL,
+  `tanggal_masuk` date DEFAULT NULL,
+  `STATUS` varchar(100) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `keluar`
+-- Dumping data untuk tabel `barang`
 --
 
-INSERT INTO `keluar` (`idkeluar`, `idbarang`, `namabarang`, `tanggal`, `jmlkeluar`, `penerima`) VALUES
-(7, 1014, 'OPPO RENO 11 PRO', '2024-01-22', 2, 'AMU'),
-(8, 1016, 'IPHONE 14 PRO', '2024-01-22', 2, 'indri');
+INSERT INTO `barang` (`kd_barang`, `nama_barang`, `jumlah`, `satuan`, `tanggal_masuk`, `STATUS`, `keterangan`) VALUES
+(2025080901, 'Laptop Lenovo Thinkpad', 10, 'Unit', '2025-08-01', NULL, 'Kondisi baru'),
+(2025080902, 'Proyektor Epson', 5, 'Unit', '2025-08-05', NULL, 'Butuh perawatan rutin'),
+(2025080903, 'Kabel HDMI 2M', 50, 'Pcs', '2025-08-10', NULL, 'Stok gudang utama'),
+(2025080904, 'Meja Kerja Kayu', 7, 'Unit', '2025-08-15', NULL, 'Stok ruang rapat');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `masuk`
+-- Struktur dari tabel `peminjaman`
 --
 
-CREATE TABLE `masuk` (
-  `idmasuk` int(11) NOT NULL,
-  `idbarang` int(11) NOT NULL,
-  `namabarang` varchar(50) NOT NULL,
-  `tanggal` date NOT NULL,
-  `jmlmasuk` int(100) NOT NULL,
-  `penerima` varchar(50) NOT NULL
+CREATE TABLE `peminjaman` (
+  `NO` int(11) NOT NULL,
+  `kd_barang` bigint(20) DEFAULT NULL,
+  `nama_barang` varchar(100) DEFAULT NULL,
+  `nama_peminjam` varchar(100) NOT NULL,
+  `nip` varchar(50) DEFAULT NULL,
+  `kontak` varchar(100) DEFAULT NULL,
+  `jumlah` int(11) NOT NULL,
+  `univ_jurusan` varchar(50) DEFAULT NULL,
+  `cabang` varchar(100) DEFAULT NULL,
+  `keterangan` varchar(100) DEFAULT NULL,
+  `tanggal_pinjam` date NOT NULL,
+  `tanggal_kembali` date DEFAULT NULL,
+  `STATUS` enum('Dipinjam','Dikembalikan') DEFAULT 'Dipinjam'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `masuk`
+-- Dumping data untuk tabel `peminjaman`
 --
 
-INSERT INTO `masuk` (`idmasuk`, `idbarang`, `namabarang`, `tanggal`, `jmlmasuk`, `penerima`) VALUES
-(9, 1014, 'OPPO RENO 11 PRO', '2024-01-21', 4, ''),
-(11, 1016, 'IPHONE 14 PRO', '2024-01-21', 8, ''),
-(13, 1018, 'GOOGLE PIXEL 7', '2024-01-21', 3, ''),
-(14, 1019, 'SAMSUNG Z FLIP 4', '2024-01-21', 6, ''),
-(15, 1020, 'ASUS ROG PHONE 7', '2024-01-22', 3, '');
+INSERT INTO `peminjaman` (`NO`, `kd_barang`, `nama_barang`, `nama_peminjam`, `nip`, `kontak`, `jumlah`, `univ_jurusan`, `cabang`, `keterangan`, `tanggal_pinjam`, `tanggal_kembali`, `STATUS`) VALUES
+(1, 2025080901, 'Laptop Lenovo Thinkpad', 'Rahma', '224101033', '812347985', 1, 'poltek', NULL, NULL, '2025-09-29', '2025-09-29', 'Dikembalikan');
 
 -- --------------------------------------------------------
 
@@ -77,49 +529,22 @@ INSERT INTO `masuk` (`idmasuk`, `idbarang`, `namabarang`, `tanggal`, `jmlmasuk`,
 --
 
 CREATE TABLE `pengguna` (
-  `iduser` int(11) NOT NULL,
-  `nama` varchar(50) NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `pasword` varchar(10) NOT NULL
+  `NO` int(11) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `nip` varchar(50) DEFAULT NULL,
+  `kontak` int(20) DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  `PASSWORD` varchar(255) NOT NULL,
+  `ROLE` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `pengguna`
 --
 
-INSERT INTO `pengguna` (`iduser`, `nama`, `email`, `pasword`) VALUES
-(1, 'Amu Najmudin', 'amu123@gmail.com', 'amu123'),
-(2, 'Indri', 'indri@gmail.com', 'indri1'),
-(3, 'ILHAM ARIF MAULANA', 'ilhamarif123@gmail.com', '123123'),
-(4, 'Amu Najmudin', 'amu123@gmail.com', 'amu123'),
-(5, 'Deden Andika', 'deden@gmail.com', 'deden123'),
-(6, 'Sendy Gunawan', 'sendygunawwan@gmail.com', 'sendy123');
-
--- --------------------------------------------------------
-
---
--- Struktur dari tabel `stock`
---
-
-CREATE TABLE `stock` (
-  `idbarang` int(11) NOT NULL,
-  `namabarang` varchar(50) NOT NULL,
-  `tanggal` date NOT NULL,
-  `foto` varchar(100) NOT NULL,
-  `stock` varchar(50) NOT NULL,
-  `harga` int(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `stock`
---
-
-INSERT INTO `stock` (`idbarang`, `namabarang`, `tanggal`, `foto`, `stock`, `harga`) VALUES
-(1014, 'OPPO RENO 11 PRO', '2024-01-21', 'OPPO RENO 11 PRO.png', '2', 5999000),
-(1016, 'IPHONE 14 PRO', '2024-01-21', 'IPHONE 14 PRO.png', '6', 19850000),
-(1018, 'GOOGLE PIXEL 7', '2024-01-21', 'GooglePixel7pngimage.png', '3', 13000000),
-(1019, 'SAMSUNG Z FLIP 4', '2024-01-21', 'galaxyzflip4pngimage.png', '6', 8750000),
-(1020, 'ASUS ROG PHONE 7', '2024-01-22', 'ROG PHONE 7.png', '3', 13900000);
+INSERT INTO `pengguna` (`NO`, `nama`, `nip`, `kontak`, `email`, `PASSWORD`, `ROLE`) VALUES
+(1, 'Admin Sistem', '123456', NULL, 'admin@stokbarang.com', '123456', 'admin'),
+(5, 'Rahma', '224101033', 812347985, 'rahma@gmail.com', '$2y$10$dJpvZT14xvRh2zl0KgpPfO9Qor7WOTGxbk9VhFY7MS2i9RsYSNjaS', 'pegawai');
 
 -- --------------------------------------------------------
 
@@ -128,11 +553,10 @@ INSERT INTO `stock` (`idbarang`, `namabarang`, `tanggal`, `foto`, `stock`, `harg
 --
 
 CREATE TABLE `stok_keluar` (
-  `id` int(11) NOT NULL,
-  `namabarang` varchar(255) NOT NULL,
-  `tanggal` date NOT NULL,
-  `deskripsi` text NOT NULL,
-  `stok_keluar` int(11) NOT NULL
+  `NO` int(11) NOT NULL,
+  `kd_barang` bigint(20) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `tanggal_keluar` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -143,9 +567,9 @@ CREATE TABLE `stok_keluar` (
 
 CREATE TABLE `stok_masuk` (
   `id` int(11) NOT NULL,
-  `namabarang` varchar(255) NOT NULL,
-  `tanggal_masuk` date NOT NULL,
-  `jumlah_masuk` int(11) NOT NULL
+  `kd_barang` bigint(20) NOT NULL,
+  `jumlah` int(11) NOT NULL,
+  `tanggal_masuk` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -153,76 +577,66 @@ CREATE TABLE `stok_masuk` (
 --
 
 --
--- Indeks untuk tabel `keluar`
+-- Indeks untuk tabel `barang`
 --
-ALTER TABLE `keluar`
-  ADD PRIMARY KEY (`idkeluar`),
-  ADD KEY `fk2dbarang` (`idbarang`);
+ALTER TABLE `barang`
+  ADD PRIMARY KEY (`kd_barang`);
 
 --
--- Indeks untuk tabel `masuk`
+-- Indeks untuk tabel `peminjaman`
 --
-ALTER TABLE `masuk`
-  ADD PRIMARY KEY (`idmasuk`),
-  ADD KEY `fk1dbarang` (`idbarang`);
+ALTER TABLE `peminjaman`
+  ADD PRIMARY KEY (`NO`),
+  ADD KEY `fk_peminjaman_barang` (`kd_barang`);
 
 --
 -- Indeks untuk tabel `pengguna`
 --
 ALTER TABLE `pengguna`
-  ADD PRIMARY KEY (`iduser`);
-
---
--- Indeks untuk tabel `stock`
---
-ALTER TABLE `stock`
-  ADD PRIMARY KEY (`idbarang`);
+  ADD PRIMARY KEY (`NO`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indeks untuk tabel `stok_keluar`
 --
 ALTER TABLE `stok_keluar`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`NO`),
+  ADD KEY `fk_stok_keluar_barang` (`kd_barang`);
 
 --
 -- Indeks untuk tabel `stok_masuk`
 --
 ALTER TABLE `stok_masuk`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_stok_masuk_barang` (`kd_barang`);
 
 --
 -- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT untuk tabel `keluar`
+-- AUTO_INCREMENT untuk tabel `barang`
 --
-ALTER TABLE `keluar`
-  MODIFY `idkeluar` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+ALTER TABLE `barang`
+  MODIFY `kd_barang` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2025080905;
 
 --
--- AUTO_INCREMENT untuk tabel `masuk`
+-- AUTO_INCREMENT untuk tabel `peminjaman`
 --
-ALTER TABLE `masuk`
-  MODIFY `idmasuk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+ALTER TABLE `peminjaman`
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT untuk tabel `stock`
---
-ALTER TABLE `stock`
-  MODIFY `idbarang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1021;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `stok_keluar`
 --
 ALTER TABLE `stok_keluar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `stok_masuk`
@@ -235,16 +649,27 @@ ALTER TABLE `stok_masuk`
 --
 
 --
--- Ketidakleluasaan untuk tabel `keluar`
+-- Ketidakleluasaan untuk tabel `peminjaman`
 --
-ALTER TABLE `keluar`
-  ADD CONSTRAINT `fk2dbarang` FOREIGN KEY (`idbarang`) REFERENCES `stock` (`idbarang`);
+ALTER TABLE `peminjaman`
+  ADD CONSTRAINT `fk_peminjaman_barang` FOREIGN KEY (`kd_barang`) REFERENCES `barang` (`kd_barang`);
 
 --
--- Ketidakleluasaan untuk tabel `masuk`
+-- Ketidakleluasaan untuk tabel `stok_keluar`
 --
-ALTER TABLE `masuk`
-  ADD CONSTRAINT `fk1dbarang` FOREIGN KEY (`idbarang`) REFERENCES `stock` (`idbarang`);
+ALTER TABLE `stok_keluar`
+  ADD CONSTRAINT `fk_stok_keluar_barang` FOREIGN KEY (`kd_barang`) REFERENCES `barang` (`kd_barang`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `stok_masuk`
+--
+ALTER TABLE `stok_masuk`
+  ADD CONSTRAINT `fk_stok_masuk_barang` FOREIGN KEY (`kd_barang`) REFERENCES `barang` (`kd_barang`) ON DELETE CASCADE;
+--
+-- Database: `test`
+--
+CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `test`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
