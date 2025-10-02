@@ -3,33 +3,6 @@ session_start();
 include "koneksi.php";
 require_once __DIR__ . "/phpqrcode/qrlib.php";
 
-// --- Konfigurasi QRCode ---
-if (!defined('QR_CACHEABLE')) define('QR_CACHEABLE', true);
-if (!defined('QR_CACHE_DIR')) define('QR_CACHE_DIR', __DIR__ . "/phpqrcode/cache/");
-if (!defined('QR_LOG_DIR')) define('QR_LOG_DIR', __DIR__ . "/phpqrcode/logs/");
-if (!defined('QR_FIND_BEST_MASK')) define('QR_FIND_BEST_MASK', true);
-if (!defined('QR_FIND_FROM_RANDOM')) define('QR_FIND_FROM_RANDOM', false);
-if (!defined('QR_DEFAULT_MASK')) define('QR_DEFAULT_MASK', 2);
-if (!defined('QR_PNG_MAXIMUM_SIZE')) define('QR_PNG_MAXIMUM_SIZE', 1024);
-
-// pastikan folder ada
-if (!file_exists(QR_CACHE_DIR)) mkdir(QR_CACHE_DIR, 0755, true);
-if (!file_exists(QR_LOG_DIR)) mkdir(QR_LOG_DIR, 0755, true);
- 
-$tempDir = __DIR__ . "/qrcodes/";
-if (!file_exists($tempDir)) {
-    mkdir($tempDir, 0755, true);
-}
-
-// === Generate semua QR Code otomatis saat halaman dibuka ===
-$all_barang = mysqli_query($db, "SELECT kd_barang FROM barang");
-while ($row = mysqli_fetch_assoc($all_barang)) {
-    $fileName = $tempDir . $row['kd_barang'] . ".png";
-    if (!file_exists($fileName)) {
-        QRcode::png($row['kd_barang'], $fileName, QR_ECLEVEL_L, 4, 2);
-    }
-}
-
 $role = $_SESSION['role'] ?? '';
 $nama = $_SESSION['nama'] ?? '';
 
@@ -74,6 +47,15 @@ if ($row = mysqli_fetch_assoc($query_hp_keluar)) {
 // Query stok barang dengan Telor Asin selalu di atas
 $sql_barang = "SELECT * FROM barang ORDER BY (nama_barang='Telor Asin') DESC, kd_barang ASC";
 $query_barang = mysqli_query($db, $sql_barang);
+
+// Ambil semua barang untuk modal QR Code
+$result_qr = mysqli_query($db, "SELECT kd_barang, nama_barang FROM barang ORDER BY kd_barang ASC");
+
+// folder sementara untuk QR
+$tempDir = __DIR__ . "/qrcodes/";
+if (!file_exists($tempDir)) {
+    mkdir($tempDir, 0755, true);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -86,11 +68,20 @@ $query_barang = mysqli_query($db, $sql_barang);
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-  
-  .menu-link .card { transition: 0.3s; }
-  .menu-link:hover .card { background: #f8f9fa; transform: scale(1.02); }
-  .menu-link.active .card { background: #3AB0A2; color: #fff; }
-  .menu-link.active .card i { color: #fff !important; }
+  .menu-link .card {
+    transition: 0.3s;
+  }
+  .menu-link:hover .card {
+    background: #f8f9fa;
+    transform: scale(1.02);
+  }
+  .menu-link.active .card {
+    background: #3AB0A2;
+    color: #fff;
+  }
+  .menu-link.active .card i {
+    color: #fff !important;
+  }
 
 body { font-family: 'Poppins', sans-serif; background: #f5f7f7; margin: 0; padding: 0; }
 .navbar { background-color: #3AB0A2; padding: 12px; color: white; }
@@ -116,37 +107,31 @@ footer { background-color: #8BC6BF; }
 .icon-delete { color: #dc3545; }
 .icon-delete:hover { color: #a71d2a; transform: scale(1.2); }
 
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #printQRModal,
-  #printQRModal * {
-    visibility: visible;
-  }
-  #printQRModal {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    height: auto;
-  
-  }
-  #printQRModal .modal-header,
-  #printQRModal .modal-footer {
-    display: none !important;
-  }
-
-
-  /* QR Code rapih saat cetak */
-  #printQRModal .text-center {
-    page-break-inside: avoid; /* Jangan terpotong */
-    break-inside: avoid;
-  }
+/* Style untuk modal print QR */
+.qr-grid { 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
 }
-
-
+.qr-item {
+    text-align: center;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+}
+.qr-item img {
+    width: 120px;
+    height: 120px;
+}
+.qr-item .nama {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+@media print {
+    .no-print { display: none; }
+    .qr-item { border: none; }
+}
 </style>
 </head>
 <body>
@@ -179,15 +164,78 @@ footer { background-color: #8BC6BF; }
         <div class="text-center mb-3">
             <img src="img/Logo.png" alt="Logo" style="height:50px; object-fit:contain;">
         </div>
-        <!-- Menu Sidebar -->
-        <a href="beranda.php"><div class="card"><div class="card-body"><h6 class="card-title">Beranda</h6><p>Halaman Utama</p><i class="fa-solid fa-house text-primary"></i></div></div></a>
-        <a href="hal.php" class="menu-link <?= ($current_page == 'hal.php') ? 'active' : '' ?>"><div class="card"><div class="card-body"><h6 class="card-title">Data Barang</h6><p>Stok: <strong><?= $stok_hp; ?></strong></p><i class="fa-solid fa-box text-success"></i></div></div></a>
-        <a href="pengguna.php" class="menu-link <?= ($current_page == 'pengguna.php') ? 'active' : '' ?>"><div class="card"><div class="card-body"><h6 class="card-title">Pegawai</h6><p>Data Pegawai</p><i class="fa-solid fa-user text-primary"></i></div></div></a>
-        <a href="peminjaman.php"><div class="card"><div class="card-body"><h6 class="card-title">Peminjaman</h6><p>Form Peminjaman Barang</p><i class="fa-solid fa-hand-holding text-success"></i></div></div></a>
-        <a href="pengembalian.php"><div class="card"><div class="card-body"><h6 class="card-title">Pengembalian</h6><p>Form Pengembalian Barang</p><i class="fa-solid fa-rotate-left text-danger"></i></div></div></a>
+
+        <!-- BERANDA -->
+        <a href="beranda.php">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Beranda</h6>
+              <p>Halaman Utama</p>
+              <i class="fa-solid fa-house text-primary"></i>
+            </div>
+          </div>
+        </a>
+
+        <a href="hal.php" class="menu-link <?= ($current_page == 'hal.php') ? 'active' : '' ?>">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Data Barang</h6>
+      <p>Stok: <strong><?= $stok_hp; ?></strong></p>
+      <i class="fa-solid fa-box text-success"></i>
+    </div>
+  </div>
+</a>
+
+        <a href="pengguna.php" class="menu-link <?= ($current_page == 'pengguna.php') ? 'active' : '' ?>">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Pegawai</h6>
+      <p>Data Pegawai</p>
+      <i class="fa-solid fa-user text-primary"></i>
+    </div>
+  </div>
+</a>
+
+        <!-- Semua role -->
+        <a href="peminjaman.php">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Peminjaman</h6>
+              <p>Form Peminjaman Barang</p>
+              <i class="fa-solid fa-hand-holding text-success"></i>
+            </div>
+          </div>
+        </a>
+        <a href="pengembalian.php">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Pengembalian</h6>
+              <p>Form Pengembalian Barang</p>
+              <i class="fa-solid fa-rotate-left text-danger"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- Menu admin -->
         <?php if($role == 'admin' || $role == 'Admin'): ?>
-        <a href="riwayat.php"><div class="card"><div class="card-body"><h6 class="card-title">Riwayat</h6><p>Lihat Riwayat</p><i class="fa-solid fa-clock-rotate-left text-warning"></i></div></div></a>
-        <a href="laporan.php"><div class="card"><div class="card-body"><h6 class="card-title">Laporan</h6><p>Cetak / Lihat Laporan</p><i class="fa-solid fa-file-alt text-info"></i></div></div></a>
+        <a href="riwayat.php">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Riwayat</h6>
+              <p>Lihat Riwayat</p>
+              <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+            </div>
+          </div>
+        </a>
+        <a href="laporan.php">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Laporan</h6>
+              <p>Cetak / Lihat Laporan</p>
+              <i class="fa-solid fa-file-alt text-info"></i>
+            </div>
+          </div>
+        </a>
         <?php endif; ?>
       </div>
     </div>
@@ -219,7 +267,13 @@ footer { background-color: #8BC6BF; }
                   echo "<td><i class='fa-solid fa-cube me-2 text-secondary'></i> {$barang['nama_barang']}</td>";
                   echo "<td class='text-center'>{$barang['jumlah']}</td>";
                   echo "<td class='text-center'>
-                          <button class='btn btn-sm text-primary' data-bs-toggle='modal' data-bs-target='#editModal' data-kd='{$barang['kd_barang']}' data-nama='".htmlspecialchars($barang['nama_barang'], ENT_QUOTES)."' data-jumlah='{$barang['jumlah']}'><i class='fa-regular fa-pen-to-square'></i></button>
+                          <button class='btn btn-sm text-primary' 
+                                  data-bs-toggle='modal' data-bs-target='#editModal'
+                                  data-kd='{$barang['kd_barang']}'
+                                  data-nama='".htmlspecialchars($barang['nama_barang'], ENT_QUOTES)."'
+                                  data-jumlah='{$barang['jumlah']}'>
+                                  <i class='fa-regular fa-pen-to-square'></i>
+                          </button>
                           <a href='javascript:void(0);' onclick='konfirmasiHapus({$barang['kd_barang']})' class='text-danger ms-2'><i class='fa-solid fa-trash'></i></a>
                           <a href='qrcode.php?kd_barang={$barang['kd_barang']}' target='_blank' class='text-success ms-2'><i class='fa-solid fa-qrcode'></i></a>
                         </td>";
@@ -231,14 +285,67 @@ footer { background-color: #8BC6BF; }
           </table>
         </div>
 
-<!-- Tombol -->
+<!-- Tombol Kembali, Template, Import -->
 <div class="mt-3 text-end">
-    <a href="download_template.php" class="btn btn-warning me-2"><i class="fa-solid fa-download me-2"></i> Template CSV</a>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal"><i class="fa-solid fa-file-csv me-2"></i> Tambah Stok Barang (Import CSV)</button>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#printQRModal"><i class="fa-solid fa-qrcode me-2"></i> Print Semua QR Code</button>
+    <a href="download_template.php" class="btn btn-warning me-2">
+        <i class="fa-solid fa-download me-2"></i> Template CSV
+    </a>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+        <i class="fa-solid fa-file-csv me-2"></i> Tambah Stok Barang (Import CSV)
+    </button>
+    <!-- Tombol untuk popup print QR -->
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#printQRModal">
+        <i class="fa-solid fa-qrcode me-2"></i> Print Semua QR Code
+    </button>
 </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Modal Import CSV -->
+<div class="modal fade" id="importModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form action="import_csv.php" method="post" enctype="multipart/form-data" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa-solid fa-file-csv me-2 text-success"></i>Import CSV</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Upload file CSV dengan format:<br><b>Kode Barang, Nama Barang, Jumlah</b></p>
+        <input type="file" name="file_csv" accept=".csv" class="form-control" required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="import" class="btn btn-primary">Import</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Edit Barang -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="post" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sunting Barang</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="kd_barang" id="edit_kd_barang">
+        <div class="mb-3">
+          <label class="form-label">Nama Barang</label>
+          <input type="text" name="nama_barang" id="edit_nama_barang" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Jumlah</label>
+          <input type="number" name="jumlah" id="edit_jumlah" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="update" class="btn btn-primary">Simpan Perubahan</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -247,43 +354,38 @@ footer { background-color: #8BC6BF; }
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header no-print">
-        <h5 class="modal-title">Print Semua QR Code</h5>
+        <h5 class="modal-title">Print Semua QR Code Barang</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <div class="d-flex flex-wrap gap-3 justify-content-start">
-          <?php 
-          // buat query baru khusus untuk modal
-          $qr_barang = mysqli_query($db, "SELECT kd_barang, nama_barang FROM barang ORDER BY kd_barang ASC");
-          while ($row = mysqli_fetch_assoc($qr_barang)): 
+        <div class="qr-grid">
+          <?php while ($row = mysqli_fetch_assoc($result_qr)): ?>
+            <?php
               $fileName = $tempDir . $row['kd_barang'] . ".png";
               if (!file_exists($fileName)) {
                   QRcode::png($row['kd_barang'], $fileName, QR_ECLEVEL_L, 4, 2);
               }
-          ?>
-            <div class="text-center border p-2 rounded">
-              <img src="qrcodes/<?= $row['kd_barang'] ?>.png" width="120">
-              <div class="fw-bold mt-1"><?= htmlspecialchars($row['nama_barang']) ?></div>
-              <small><?= $row['kd_barang'] ?></small>
+            ?>
+            <div class="qr-item">
+              <img src="qrcodes/<?= $row['kd_barang'] ?>.png" alt="QR">
+              <div class="nama"><?= htmlspecialchars($row['nama_barang']) ?></div>
+              <div class="small"><?= $row['kd_barang'] ?></div>
             </div>
           <?php endwhile; ?>
         </div>
       </div>
       <div class="modal-footer no-print">
-        <button onclick="window.print()" class="btn btn-primary">
-          <i class="fa fa-print me-2"></i> Print
-        </button>
+        <button onclick="window.print()" class="btn btn-primary"><i class="fa fa-print me-2"></i> Print</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
       </div>
     </div>
   </div>
 </div>
 
-
-
-
 <footer class="text-center py-3 mt-auto">
-  <div class="container"><p>&copy; Direktorat Poltekkes Bandung</p></div>
+  <div class="container">
+    <p>&copy; Direktorat Poltekkes Bandung</p>
+  </div>
 </footer>
 
 <script>
@@ -292,6 +394,8 @@ function konfirmasiHapus(kd_barang) {
         window.location.href = 'hapus.php?kd_barang=' + kd_barang;
     }
 }
+
+// Isi data modal edit ketika tombol edit diklik
 var editModal = document.getElementById('editModal');
 editModal.addEventListener('show.bs.modal', function(event){
     var button = event.relatedTarget;
@@ -300,6 +404,7 @@ editModal.addEventListener('show.bs.modal', function(event){
     document.getElementById('edit_jumlah').value = button.getAttribute('data-jumlah');
 });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
